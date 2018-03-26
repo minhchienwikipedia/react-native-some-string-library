@@ -11,7 +11,7 @@
 #import <React/RCTConvert.h>
 //#import "RCTEventEmitter.h"
 
-@implementation SomeString {
+@implementation RNSomeStringLibrary {
   BOOL hasListeners;
 }
 
