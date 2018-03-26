@@ -3,10 +3,15 @@
 ## Getting started
 
 `$ npm install react-native-some-string-library --save`
+OR
+`$ yarn add react-native-some-string-library`
 
 ### Mostly automatic installation
-
+1. Link
 `$ react-native link react-native-some-string-library`
+
+2. Unlink
+`$ react-native unlink react-native-some-string-library`
 
 ### Manual installation
 
@@ -44,21 +49,38 @@
 * Add `using Some.String.Library.RNSomeStringLibrary;` to the usings at the top of the file
 * Add `new RNSomeStringLibraryPackage()` to the `List<IReactPackage>` returned by the `Packages` method
 
+## Use
+```javascript
+import RNSomeStringLibrary from 'react-native-some-string-library';
+
+
+// Put value and call back data
+RNSomeStringLibrary.hello(val, data => this.setState({ data }))
+
+// Check string or number
+RNSomeStringLibrary.isString(val)
+              .then(data => this.setState({ data },()=> console.log('this is string')))
+              .catch(data => this.setState({ data: data.message },()=> console.log('this is number')))
+
+```
+
 ## Example
 
 ```javascript
+
 import React, { Component } from 'react';
 import {
   Platform,
   StyleSheet,
   Text,
   View,
-  Button,
-  TextInput
+  TextInput,
+  TouchableOpacity
 } from 'react-native';
+
 import RNSomeStringLibrary from 'react-native-some-string-library';
 
-export default class App extends Component<Props> {
+export default class App extends Component {
   state = {
     data: '',
     val: ''
@@ -67,7 +89,7 @@ export default class App extends Component<Props> {
     const { data, val } = this.state;
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to My MyCustomModule!</Text>
+        <Text style={styles.welcome}>Welcome to My Custom Module!</Text>
 
         <TextInput
           style={{
@@ -82,24 +104,28 @@ export default class App extends Component<Props> {
               val
             })
           }
+          underlineColorAndroid="transparent"
         />
-        <Button
-          title="Say Hello"
+        <Text
           onPress={() =>
-            MyCustomModule.hello(val, data => this.setState({ data }))
+            RNSomeStringLibrary.hello(val, data => this.setState({ data }))
           }
-        />
-        <Button
-          title="Check is string"
+          style={styles.text}
+        >
+          Say Hello
+        </Text>
+        <Text
           onPress={() =>
-            MyCustomModule.isString(val)
-              .then(data =>
-                this.setState({ data: data })
-              .catch(data =>
-                this.setState({ data: data.message })
+            RNSomeStringLibrary.isString(val)
+              .then(data => this.setState({ data }))
+              .catch(data => this.setState({ data: data.message }))
           }
-        />
-        <Text>{data}</Text>
+          style={styles.text}
+        >
+          Check is string
+        </Text>
+
+        <Text style={{ padding: 20 }}>{data}</Text>
       </View>
     );
   }
@@ -110,7 +136,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF'
+    backgroundColor: '#fff'
   },
   welcome: {
     fontSize: 20,
@@ -121,6 +147,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5
-  }
+  },
+  text: { color: '#47A4E0', marginTop: 20, fontSize: 20 }
 });
+
 ```
