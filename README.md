@@ -2,16 +2,21 @@
 
 ## Getting started
 
-`$ npm install react-native-some-string-library --save`
-OR
-`$ yarn add react-native-some-string-library`
+1.  Automatic installation and link
+    `$ react-native install react-native-some-string-library`
+
+2.  Add package
+    `$ npm install react-native-some-string-library --save`
+    OR
+    `$ yarn add react-native-some-string-library`
 
 ### Mostly automatic installation
-1. Link
-`$ react-native link react-native-some-string-library`
 
-2. Unlink
-`$ react-native unlink react-native-some-string-library`
+1.  Link
+    `$ react-native link react-native-some-string-library`
+
+2.  Unlink
+    `$ react-native unlink react-native-some-string-library`
 
 ### Manual installation
 
@@ -39,35 +44,50 @@ OR
       compile project(':react-native-some-string-library')
     ```
 
-#### Windows
-
-[Read it! :D](https://github.com/ReactWindows/react-native)
-
-1.  In Visual Studio add the `RNSomeStringLibrary.sln` in `node_modules/react-native-some-string-library/windows/RNSomeStringLibrary.sln` folder to their solution, reference from their app.
-2.  Open up your `MainPage.cs` app
-
-* Add `using Some.String.Library.RNSomeStringLibrary;` to the usings at the top of the file
-* Add `new RNSomeStringLibraryPackage()` to the `List<IReactPackage>` returned by the `Packages` method
-
 ## Use
+
 ```javascript
 import RNSomeStringLibrary from 'react-native-some-string-library';
 
-
 // Put value and call back data
-RNSomeStringLibrary.hello(val, data => this.setState({ data }))
+RNSomeStringLibrary.hello(val.toString(), data => this.setState({ data }));
 
 // Check string or number
-RNSomeStringLibrary.isString(val)
-              .then(data => this.setState({ data },()=> console.log('this is string')))
-              .catch(data => this.setState({ data: data.message },()=> console.log('this is number')))
+RNSomeStringLibrary.isString(val.toString())
+  .then(data => this.setState({ data }, () => console.log('this is string')))
+  .catch(data =>
+    this.setState({ data: data.message }, () => console.log('this is number'))
+  );
 
+// Get info, get some type value
+MyCustomModule.getInfo(
+              'Iphone',
+              4,
+              300.012,
+              true,
+              [1, 'two', 'three'],
+              {
+                id: 321321,
+                name: 'Minh Chien',
+                age: 23
+              },
+              data => this.setState({ data: JSON.stringify(data) })
+            )
+// Event listener
+componentDidMount() {
+    this.addListener = myCustomModuleEmitter.addListener('addEvent', event =>
+      this.setState({ data: JSON.stringify(event) })
+    );
+  }
+
+  componentWillUnmount() {
+    this.addListener.remove();
+  }
 ```
 
 ## Example
 
 ```javascript
-
 import React, { Component } from 'react';
 import {
   Platform,
@@ -75,21 +95,33 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  NativeEventEmitter
 } from 'react-native';
 
 import RNSomeStringLibrary from 'react-native-some-string-library';
 
-export default class App extends Component {
+const myCustomModuleEmitter = new NativeEventEmitter(RNSomeStringLibrary);
+
+export default class App extends Component<Props> {
   state = {
     data: '',
     val: ''
   };
+  componentDidMount() {
+    this.addListener = myCustomModuleEmitter.addListener('addEvent', event =>
+      this.setState({ data: JSON.stringify(event) })
+    );
+  }
+
+  componentWillUnmount() {
+    this.addListener.remove();
+  }
   render() {
     const { data, val } = this.state;
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to My Custom Module!</Text>
+        <Text style={styles.welcome}>Welcome to My MyCustomModule!</Text>
 
         <TextInput
           style={{
@@ -98,34 +130,66 @@ export default class App extends Component {
             borderBottomColor: 'gray',
             borderBottomWidth: 1
           }}
+          placeholder="Type..."
           value={val}
+          underlineColorAndroid="transparent"
           onChangeText={val =>
             this.setState({
               val
             })
           }
-          underlineColorAndroid="transparent"
         />
         <Text
-          onPress={() =>
-            RNSomeStringLibrary.hello(val, data => this.setState({ data }))
-          }
           style={styles.text}
+          onPress={() =>
+            MyCustomModule.hello(val, data => this.setState({ data }))
+          }
         >
-          Say Hello
+          Say Hi
         </Text>
         <Text
+          style={styles.text}
           onPress={() =>
-            RNSomeStringLibrary.isString(val)
-              .then(data => this.setState({ data }))
+            MyCustomModule.isString(val)
+              .then(data => this.setState({ data: data }))
               .catch(data => this.setState({ data: data.message }))
           }
-          style={styles.text}
         >
           Check is string
         </Text>
+        <Text
+          style={styles.text}
+          onPress={() =>
+            MyCustomModule.getInfo(
+              'Iphone',
+              4,
+              300.012,
+              true,
+              [1, 'two', 'three'],
+              {
+                id: 321321,
+                name: 'Minh Chien',
+                age: 23
+              },
+              data => this.setState({ data: JSON.stringify(data) })
+            )
+          }
+        >
+          Get Info
+        </Text>
+        <Text
+          style={styles.text}
+          onPress={() =>
+            MyCustomModule.addEvent('addEvent', {
+              value: val.toString(),
+              time: new Date().toISOString()
+            })
+          }
+        >
+          Add Event
+        </Text>
 
-        <Text style={{ padding: 20 }}>{data}</Text>
+        <Text>{data}</Text>
       </View>
     );
   }
@@ -136,7 +200,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff'
+    backgroundColor: '#F5FCFF'
   },
   welcome: {
     fontSize: 20,
@@ -148,7 +212,6 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5
   },
-  text: { color: '#47A4E0', marginTop: 20, fontSize: 20 }
+  text: { marginTop: 20, color: '#47A4E0', fontSize: 20 }
 });
-
 ```

@@ -10,6 +10,6 @@
  * Basic native module without support emit event, we just need NSObject<RCTBridgeModule>
  * othercase we need RCTEventEmitter<RCTBridgeModule>
  */
-@interface RNSomeStringLibrary: NSObject<RCTBridgeModule>
+@interface RNSomeStringLibrary: RCTEventEmitter<RCTBridgeModule>
 
 @end
